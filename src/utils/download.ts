@@ -1,6 +1,7 @@
 import type { QRParams } from '@/types';
 import { buildQrData, encodeQRMatrix } from '@/encoder/qrEncoder';
 import { renderQRCode, canvasToBlob } from '@/renderer';
+import { svgrRenderQRCode, svgToBlob } from '@/renderer/svg';
 
 /** 下载二维码 */
 export async function downloadQRCode(params: QRParams): Promise<void> {
@@ -14,27 +15,37 @@ export async function downloadQRCode(params: QRParams): Promise<void> {
     throw new Error('QR 编码失败：内容过长或包含不支持的字符');
   }
 
-  // 创建离屏 Canvas 渲染
-  const canvas = document.createElement('canvas');
-  await renderQRCode({ canvas, matrix, params });
+  const isSvg = params.export.format === 'svg';
 
-  // 生成 Blob
-  const blob = await canvasToBlob(canvas);
+  if (isSvg) {
+    // SVG 路径：直接生成字符串 → Blob
+    const svgString = svgrRenderQRCode({ matrix, params });
+    const blob = svgToBlob(svgString);
+    downloadBlob(blob, params.export.fileName, 'svg');
+  } else {
+    // PNG 路径：Canvas 渲染 → Blob
+    const canvas = document.createElement('canvas');
+    await renderQRCode({ canvas, matrix, params });
+    const blob = await canvasToBlob(canvas);
+    downloadBlob(blob, params.export.fileName, 'png');
+  }
+}
 
-  // 确保文件名有 .png 扩展名
-  let fileName = params.export.fileName;
-  if (!fileName) {
-    fileName = `QRMagic_${new Date().getTime()}.png`;
-  } else if (!fileName.endsWith('.png')) {
-    fileName = `${fileName}.png`;
+/** 触发浏览器下载 */
+function downloadBlob(blob: Blob, fileName: string, ext: string): void {
+  let finalName = fileName;
+  const extWithDot = `.${ext}`;
+  if (!finalName) {
+    finalName = `QRMagic_${new Date().getTime()}${extWithDot}`;
+  } else if (!finalName.endsWith(extWithDot)) {
+    finalName = `${finalName}${extWithDot}`;
   }
 
-  // 安全的 Blob URL 管理
   const url = URL.createObjectURL(blob);
   try {
     const link = document.createElement('a');
     link.href = url;
-    link.download = fileName;
+    link.download = finalName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

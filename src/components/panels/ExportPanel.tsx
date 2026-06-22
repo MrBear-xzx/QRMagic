@@ -37,7 +37,7 @@ export function ExportPanel() {
           onChange={(v) => updateExport({ format: v })}
           options={[
             { value: 'png', label: 'PNG 位图' },
-            { value: 'svg', label: 'SVG 矢量 (即将推出)', disabled: true },
+            { value: 'svg', label: 'SVG 矢量' },
           ]}
         />
       </Form.Item>
@@ -85,7 +85,7 @@ export function ExportPanel() {
           fontWeight: 600,
         }}
       >
-        下载 PNG
+        {exportParams.format === 'svg' ? '下载 SVG' : '下载 PNG'}
       </Button>
     </div>
   );
