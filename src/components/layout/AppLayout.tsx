@@ -12,6 +12,7 @@ import { ColorPanel } from '../panels/ColorPanel';
 import { LogoPanel } from '../panels/LogoPanel';
 import { BorderPanel } from '../panels/BorderPanel';
 import { ExportPanel } from '../panels/ExportPanel';
+import { BatchPanel } from '../panels/BatchPanel';
 import { QRPreview } from '../preview/QRPreview';
 
 const { Text } = Typography;
@@ -52,6 +53,12 @@ const panelItems = [
     label: '导出',
     icon: <span style={{ fontSize: 16 }}>⬇️</span>,
     children: <ExportPanel />,
+  },
+  {
+    key: 'batch',
+    label: '批量生成',
+    icon: <span style={{ fontSize: 16 }}>📦</span>,
+    children: <BatchPanel />,
   },
 ];
 
