@@ -6,8 +6,6 @@ const DOT_STYLES: { value: DotStyle; label: string }[] = [
   { value: 'square', label: '方块' },
   { value: 'circle', label: '圆形' },
   { value: 'rounded', label: '圆角方块' },
-  { value: 'diamond', label: '菱形' },
-  { value: 'star', label: '五角星' },
 ];
 
 export function StylePanel() {

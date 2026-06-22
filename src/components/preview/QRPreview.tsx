@@ -106,7 +106,7 @@ export function QRPreview() {
         <canvas
           ref={canvasRef}
           className="block"
-          style={{ maxWidth: 'none' }}
+          style={{ maxWidth: 640, height: 'auto' }}
         />
       </div>
 

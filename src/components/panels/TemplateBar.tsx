@@ -30,7 +30,7 @@ export function TemplateBar() {
         快速模板
       </div>
       <div
-        className="flex gap-2 overflow-x-auto pb-1"
+        className="flex gap-2 overflow-x-auto py-1"
         style={{ scrollbarWidth: 'thin' }}
       >
         {builtinTemplates.map((tpl) => {

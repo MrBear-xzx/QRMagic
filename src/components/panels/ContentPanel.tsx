@@ -21,14 +21,29 @@ export function ContentPanel() {
     switch (content.type) {
       case 'text':
         return (
-          <Form.Item label="文本内容">
-            <Input.TextArea
-              rows={3}
-              value={content.text}
-              onChange={(e) => updateContent({ text: e.target.value })}
-              placeholder="输入要生成二维码的文本内容"
-            />
-          </Form.Item>
+          <>
+            <Form.Item label="文本内容">
+              <Input.TextArea
+                rows={3}
+                value={content.text}
+                onChange={(e) => updateContent({ text: e.target.value })}
+                placeholder="输入要生成二维码的文本内容"
+              />
+            </Form.Item>
+            <div
+              style={{
+                fontSize: 12,
+                color: '#FF9F0A',
+                background: 'rgba(255, 159, 10, 0.1)',
+                border: '1px solid rgba(255, 159, 10, 0.25)',
+                borderRadius: 6,
+                padding: '6px 10px',
+                lineHeight: 1.5,
+              }}
+            >
+              ⚠️ 微信扫一扫不支持展示二维码中的中文
+            </div>
+          </>
         );
       case 'url':
         return (

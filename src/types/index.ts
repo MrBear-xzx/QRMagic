@@ -2,7 +2,7 @@
 export type ContentType = 'text' | 'url' | 'vcard' | 'wifi' | 'phone' | 'email';
 
 /** 码点样式枚举 */
-export type DotStyle = 'square' | 'circle' | 'rounded' | 'diamond' | 'star';
+export type DotStyle = 'square' | 'circle' | 'rounded';
 
 /** 渐变类型 */
 export type GradientType = 'none' | 'linear' | 'radial';

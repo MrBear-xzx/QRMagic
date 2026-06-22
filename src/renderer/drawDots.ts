@@ -146,13 +146,6 @@ function drawStyledDot(
       drawRoundedRect(ctx, cx, cy, actualSize, cornerRadius);
       break;
 
-    case 'diamond':
-      drawDiamond(ctx, cx, cy, actualSize);
-      break;
-
-    case 'star':
-      drawStar(ctx, cx, cy, actualSize);
-      break;
   }
 }
 
@@ -191,36 +184,6 @@ function drawRoundedRect(
   ctx.arcTo(x, y + size, x, y + size - r, r);
   ctx.lineTo(x, y + r);
   ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
-  ctx.fill();
-}
-
-/** 绘制菱形码点 */
-function drawDiamond(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number): void {
-  const half = size / 2;
-  ctx.beginPath();
-  ctx.moveTo(cx, cy - half);
-  ctx.lineTo(cx + half, cy);
-  ctx.lineTo(cx, cy + half);
-  ctx.lineTo(cx - half, cy);
-  ctx.closePath();
-  ctx.fill();
-}
-
-/** 绘制五角星码点 */
-function drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number): void {
-  const outerR = size / 2;
-  const innerR = outerR * 0.4;
-  const points = 5;
-  ctx.beginPath();
-  for (let i = 0; i < points * 2; i++) {
-    const r = i % 2 === 0 ? outerR : innerR;
-    const angle = (Math.PI * 2 * i) / (points * 2) - Math.PI / 2;
-    const px = cx + Math.cos(angle) * r;
-    const py = cy + Math.sin(angle) * r;
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
   ctx.closePath();
   ctx.fill();
 }
