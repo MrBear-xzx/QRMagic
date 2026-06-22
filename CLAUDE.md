@@ -24,7 +24,7 @@ src/
 ├── renderer/
 │   ├── index.ts                # 渲染调度（Layer 1→5）
 │   ├── drawBackground.ts       # 背景（纯色）
-│   ├── drawDots.ts             # 码点（5 种形状 + 结构图案保护）
+│   ├── drawDots.ts             # 码点（3 种形状 + 结构图案保护）
 │   ├── drawLogo.ts             # Logo 合成
 │   ├── drawBorder.ts           # 边框装饰
 │   └── drawLabel.ts            # 文本标签
@@ -34,7 +34,7 @@ src/
 │   ├── preview/useCanvasRenderer.ts
 │   └── panels/
 │       ├── ContentPanel.tsx    # 内容类型（文本/网址/名片/WiFi/电话/邮箱）
-│       ├── StylePanel.tsx      # 码点样式（方块/圆形/圆角/菱形/星形）
+│       ├── StylePanel.tsx      # 码点样式（方块/圆形/圆角方块）
 │       ├── ColorPanel.tsx      # 颜色渐变
 │       ├── LogoPanel.tsx       # Logo 上传（customRequest 本地读取）
 │       ├── BorderPanel.tsx     # 边框 + 底部文字
@@ -92,7 +92,7 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 
 ## 注意事项
 
-- 包管理器用 FlyEnv 管理的 pnpm：`D:\tools\FlyEnv\FlyEnv-Data\app\nodejs\v24.16.0\node_modules\corepack\shims\pnpm.cmd`
+- 包管理器用 FlyEnv 管理的 pnpm
 - npm 镜像 `.npmrc` 配置为 `https://registry.npmmirror.com/`
 - Playwright 使用系统 Chrome（channel: 'chrome'），不额外下载浏览器
 - Tailwind `preflight: false` 避免与 Ant Design 样式冲突
@@ -109,7 +109,7 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 | 项目脚手架 | Vite + React 18 + TS + AntD 5 + Tailwind + Zustand | ✅ |
 | 类型系统 | QRParams / Template / ContentType / DotStyle 等 | ✅ |
 | QR 编码 | 6 种内容类型 + UTF-8 中文 + vCard 转义 | ✅ |
-| 渲染引擎 | Canvas 5 层绘制 + 5 种码点 + 渐变 + Logo + 静区 | ✅ |
+| 渲染引擎 | Canvas 5 层绘制 + 3 种码点 + 渐变 + Logo + 静区 | ✅ |
 | UI 面板 | 深色侧栏 + 手风琴面板 + 预览缩放拖拽 + 模板选择 | ✅ |
 | 导出 | PNG 下载 + 4 档尺寸 + 边距 + 文件名 | ✅ |
 | 模板 | 6 个内置模板（经典/商务/活力/清新/暗夜/极客） | ✅ |
@@ -155,16 +155,8 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 ### 下次新开会话快速启动
 
 ```bash
-# 1. 确认 Node.js 环境
-export PATH="/d/tools/FlyEnv/FlyEnv-Data/app/nodejs/v24.16.0:/d/tools/FlyEnv/FlyEnv-Data/app/nodejs/v24.16.0/node_modules/corepack/shims:$PATH"
-
-# 2. 启动开发服务器
 cd d:/workspace/AiCodingProject/QRMagic
-pnpm.cmd dev
-
-# 3. 运行已有测试
-npx playwright test --reporter=list
-
-# 4. 生产构建
-pnpm.cmd build
+pnpm dev                           # 启动开发服务器 → http://localhost:5173
+npx playwright test --reporter=list  # E2E 测试
+pnpm build                          # 生产构建
 ```
