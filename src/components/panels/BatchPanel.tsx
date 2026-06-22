@@ -4,7 +4,7 @@ import { UploadOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/ico
 import { saveAs } from 'file-saver';
 import type { UploadFile, RcFile } from 'antd/es/upload/interface';
 import { useQRStore } from '@/store/useQRStore';
-import { parseCsv, type CsvRow } from '@/utils/csvParser';
+import { parseCsv, CSV_TEMPLATE, type CsvRow } from '@/utils/csvParser';
 import { generateBatch } from '@/utils/batchGenerator';
 
 const { Text } = Typography;
@@ -93,6 +93,12 @@ export function BatchPanel() {
     abortRef.current = null;
   }, []);
 
+  /** 下载 CSV 模板 */
+  const handleDownloadTemplate = useCallback(() => {
+    const blob = new Blob(['﻿' + CSV_TEMPLATE], { type: 'text/csv;charset=utf-8' });
+    saveAs(blob, 'QRMagic_导入模板.csv');
+  }, []);
+
   // 预览表格列定义
   const previewColumns = [
     {
@@ -124,12 +130,39 @@ export function BatchPanel() {
 
   return (
     <div>
+      {/* 使用说明 */}
+      <div style={{ marginBottom: 12, padding: '8px 10px', background: '#2C2C2E', borderRadius: 6 }}>
+        <Text style={{ color: '#8E8E93', fontSize: 11, lineHeight: 1.6, display: 'block' }}>
+          CSV 格式：<b style={{ color: '#E5E5EA' }}>内容,类型</b>（类型留空自动识别）
+          <br />
+          支持：文本 · 网址 · WiFi · 名片 · 电话 · 邮箱
+        </Text>
+      </div>
+
+      {/* 模板下载 */}
+      {state === 'idle' && (
+        <Button
+          block
+          onClick={handleDownloadTemplate}
+          style={{
+            background: '#3A3A3C',
+            borderColor: '#48484A',
+            color: '#E5E5EA',
+            height: 36,
+            marginBottom: 8,
+          }}
+        >
+          📥 下载 CSV 模板
+        </Button>
+      )}
+
       {/* 文件上传 */}
       <Upload
         accept=".csv"
         showUploadList={false}
         beforeUpload={handleFile}
         disabled={isGenerating}
+        style={{ width: '100%', display: 'block' }}
       >
         <Button
           icon={<UploadOutlined />}

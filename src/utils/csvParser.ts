@@ -23,11 +23,22 @@ export interface CsvParseResult {
 
 const MAX_ROWS = 200;
 
+/** CSV 模板内容 */
+export const CSV_TEMPLATE = `内容,类型
+https://github.com,网址
+你好世界！QRMagic,文本
+,网页
+test@example.com,邮箱
+S:MyWiFi;P:123456,
+13800138000,电话
+MAILTO:hello@mail.com,
+Hello World,文本`;
+
 /**
  * 解析 CSV 文件
- * - 第一行为标题行（匹配 "类型,内容" 不区分大小写）自动跳过
+ * - 格式：列1=内容，列2=类型（可选，留空自动智能识别）
+ * - 第一行为标题行（匹配 "内容,类型"）自动跳过
  * - 空白行跳过
- * - 第二列未填写时智能识别类型
  */
 export function parseCsv(file: File): Promise<CsvParseResult> {
   return new Promise((resolve, reject) => {
@@ -71,7 +82,7 @@ function parseCsvText(text: string): CsvParseResult {
     const parsed = parseLine(line);
     if (!parsed) continue;
 
-    const { rawType, content } = parsed;
+    const { content, rawType } = parsed;
 
     if (!content.trim()) {
       warnings.push(`第 ${i + 1} 行：内容为空，已跳过`);
@@ -83,6 +94,7 @@ function parseCsvText(text: string): CsvParseResult {
       return { rows, truncated: lines.length - i, warnings };
     }
 
+    // 类型列有值 → 按指定类型；否则智能识别
     const type = rawType.trim()
       ? normalizeType(rawType.trim())
       : smartDetect(content);
@@ -98,19 +110,19 @@ function parseCsvText(text: string): CsvParseResult {
   return { rows, truncated: 0, warnings };
 }
 
-/** 解析一行 CSV（简单逗号分割，支持引号包裹） */
-function parseLine(line: string): { rawType: string; content: string } | null {
-  // 简单情况：不含引号
+/** 解析一行 CSV：列1=内容, 列2=类型 */
+function parseLine(line: string): { content: string; rawType: string } | null {
+  // 不含引号：简单逗号分割
   if (!line.includes('"')) {
     const parts = line.split(',');
-    if (parts.length < 2) return null;
-    return { rawType: parts[0], content: parts.slice(1).join(',') };
+    if (parts.length === 0 || !parts[0].trim()) return null;
+    return { content: parts[0], rawType: parts[1] || '' };
   }
 
-  // 含引号的情况
+  // 含引号：处理转义
   const result = splitCsvLine(line);
-  if (result.length < 2) return null;
-  return { rawType: result[0], content: result.slice(1).join(',') };
+  if (result.length === 0 || !result[0].trim()) return null;
+  return { content: result[0], rawType: result[1] || '' };
 }
 
 /** 简单的 CSV 行分割（处理引号转义） */
@@ -139,11 +151,12 @@ function splitCsvLine(line: string): string[] {
   return parts;
 }
 
-/** 判断是否为标题行 */
+/** 判断是否为标题行（列1=内容, 列2=类型） */
 function isHeaderRow(line: string): boolean {
   const lowered = line.toLowerCase().replace(/["'\s]/g, '');
-  return lowered === '类型,内容' || lowered === 'type,content'
-    || lowered === 'type,value' || lowered === '类型,值';
+  return lowered === '内容,类型' || lowered === 'content,type'
+    || lowered === 'content,value' || lowered === '内容,值'
+    || lowered === '类型,内容' || lowered === 'type,content'; // 也兼容旧格式
 }
 
 /** 规范化类型字符串 */
@@ -151,7 +164,7 @@ function normalizeType(raw: string): ContentType {
   const lowered = raw.toLowerCase().trim();
   const map: Record<string, ContentType> = {
     text: 'text', '文本': 'text',
-    url: 'url', '网址': 'url', '链接': 'url',
+    url: 'url', '网址': 'url', '网页': 'url', '链接': 'url',
     wifi: 'wifi',
     vcard: 'vcard', '名片': 'vcard',
     phone: 'phone', '电话': 'phone', '手机': 'phone',
@@ -171,7 +184,7 @@ function smartDetect(content: string): ContentType {
   if (/^BEGIN:VCARD/i.test(trimmed)) return 'vcard';
   // 邮箱格式检测
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'email';
-  // 纯数字（含短横、加号）→ 电话
+  // 纯数字（含短横、加号、括号）→ 电话
   if (/^[\d\-\s\+\(\)]{6,}$/.test(trimmed)) return 'phone';
 
   return 'text';

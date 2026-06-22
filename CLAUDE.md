@@ -112,6 +112,7 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 | 渲染引擎 | Canvas 5 层绘制 + 3 种码点 + 渐变 + Logo + 静区 | ✅ |
 | UI 面板 | 深色侧栏 + 手风琴面板 + 预览缩放拖拽 + 模板选择 | ✅ |
 | 导出 | PNG/SVG 下载 + 4 档尺寸 + 边距 + 文件名 | ✅ |
+| 批量生成 | CSV 导入 + ZIP 导出（200 条/进度/取消） | ✅ |
 | 模板 | 6 个内置模板（经典/商务/活力/清新/暗夜/极客） | ✅ |
 | Bug 修复 | 14 个 High/Medium 问题（渐变背景、vCard 转义等） | ✅ |
 | 编译 | TypeScript strict 模式 + Vite build 通过 | ✅ |
@@ -132,7 +133,6 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 
 | 功能 | 说明 |
 |------|------|
-| 批量生成 | CSV 导入 + ZIP 导出 |
 | 历史记录 | localStorage 最近 20 条 |
 | 自定义模板 | 用户保存/管理模板 |
 | PWA | Service Worker 离线缓存 |
