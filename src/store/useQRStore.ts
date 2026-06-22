@@ -120,12 +120,17 @@ interface QRStore {
   // ========== 预览缩放 ==========
   previewScale: number;
   setPreviewScale: (scale: number) => void;
+
+  // ========== 历史记录刷新 ==========
+  historyVersion: number;
+  bumpHistoryVersion: () => void;
 }
 
 export const useQRStore = create<QRStore>((set) => ({
   params: getDefaultParams(),
   currentTemplateId: null,
   previewScale: 1,
+  historyVersion: 0,
 
   setContentType: (type) =>
     set((state) => ({
@@ -220,6 +225,8 @@ export const useQRStore = create<QRStore>((set) => ({
     }),
 
   setPreviewScale: (scale) => set({ previewScale: scale }),
+
+  bumpHistoryVersion: () => set((s) => ({ historyVersion: s.historyVersion + 1 })),
 }));
 
 /** 简易深度合并（专用于 QRParams） */

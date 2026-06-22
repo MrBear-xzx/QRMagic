@@ -13,6 +13,7 @@ import { LogoPanel } from '../panels/LogoPanel';
 import { BorderPanel } from '../panels/BorderPanel';
 import { ExportPanel } from '../panels/ExportPanel';
 import { BatchPanel } from '../panels/BatchPanel';
+import { HistoryPanel } from '../panels/HistoryPanel';
 import { QRPreview } from '../preview/QRPreview';
 
 const { Text } = Typography;
@@ -27,7 +28,7 @@ const panelItems = [
   {
     key: 'style',
     label: '码点样式',
-    icon: <span style={{ fontSize: 16 }}>◆</span>,
+    icon: <span style={{ fontSize: 16 }}>⬛</span>,
     children: <StylePanel />,
   },
   {
@@ -60,11 +61,17 @@ const panelItems = [
     icon: <span style={{ fontSize: 16 }}>📦</span>,
     children: <BatchPanel />,
   },
+  {
+    key: 'history',
+    label: '历史记录',
+    icon: <span style={{ fontSize: 16 }}>🕐</span>,
+    children: <HistoryPanel />,
+  },
 ];
 
 export function AppLayout() {
   const resetParams = useQRStore((s) => s.resetParams);
-  const [activeKeys, setActiveKeys] = useState<string[]>(['content', 'style']);
+  const [activeKeys, setActiveKeys] = useState<string[]>(['content']);
 
   const handleCollapseChange = useCallback((keys: string | string[]) => {
     setActiveKeys(Array.isArray(keys) ? keys : [keys]);

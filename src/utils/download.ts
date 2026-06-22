@@ -2,6 +2,8 @@ import type { QRParams } from '@/types';
 import { buildQrData, encodeQRMatrix } from '@/encoder/qrEncoder';
 import { renderQRCode, canvasToBlob } from '@/renderer';
 import { svgrRenderQRCode, svgToBlob } from '@/renderer/svg';
+import { saveHistory } from '@/utils/historyStorage';
+import { useQRStore } from '@/store/useQRStore';
 
 /** 下载二维码 */
 export async function downloadQRCode(params: QRParams): Promise<void> {
@@ -29,6 +31,10 @@ export async function downloadQRCode(params: QRParams): Promise<void> {
     const blob = await canvasToBlob(canvas);
     downloadBlob(blob, params.export.fileName, 'png');
   }
+
+  // 自动保存历史记录
+  saveHistory(params);
+  useQRStore.getState().bumpHistoryVersion();
 }
 
 /** 触发浏览器下载 */
