@@ -1,4 +1,4 @@
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, theme, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { AppLayout } from './components/layout/AppLayout';
 
@@ -22,7 +22,9 @@ const darkSidebarTheme = {
 export function App() {
   return (
     <ConfigProvider locale={zhCN} theme={darkSidebarTheme}>
-      <AppLayout />
+      <AntdApp>
+        <AppLayout />
+      </AntdApp>
     </ConfigProvider>
   );
 }

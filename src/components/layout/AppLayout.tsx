@@ -78,11 +78,11 @@ export function AppLayout() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden">
+    <div className="flex h-full w-full overflow-hidden mobile-stack">
       {/* ========== 深色侧栏 ========== */}
       <aside
-        className="flex flex-col h-full overflow-hidden shrink-0 w-full md:w-[380px]"
-        style={{ backgroundColor: '#1C1C1E' }}
+        className="flex flex-col h-full overflow-hidden shrink-0"
+        style={{ width: 380, backgroundColor: '#1C1C1E' }}
       >
         {/* 侧栏头部 */}
         <header

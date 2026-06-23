@@ -61,6 +61,28 @@ body {
   background: #6E6E73;
 }
 
+/* 移动端：允许滚动，侧栏/预览纵向堆叠 */
+@media (max-width: 767px) {
+  html, body, #root {
+    overflow: auto;
+    height: auto;
+  }
+  .mobile-stack {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .mobile-stack > aside {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 60vh;
+    overflow-y: auto !important;
+  }
+  .mobile-stack > main {
+    min-height: 50vh;
+  }
+}
+
 /* 减少动画偏好 */
 @media (prefers-reduced-motion: reduce) {
   *,
