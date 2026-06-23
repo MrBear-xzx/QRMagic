@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Tooltip, message, Input, Modal } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
-import { useQRStore } from '@/store/useQRStore';
+import { useQRStore, getDefaultParams } from '@/store/useQRStore';
 import { builtinTemplates } from '@/templates';
 import {
   loadCustomTemplates,
@@ -9,7 +9,9 @@ import {
   renameCustomTemplate,
   deleteCustomTemplate,
 } from '@/utils/templateStorage';
-import type { Template } from '@/types';
+import { buildQrData, encodeQRMatrix } from '@/encoder/qrEncoder';
+import { svgrRenderQRCode } from '@/renderer/svg';
+import type { Template, QRParams } from '@/types';
 
 export function TemplateBar() {
   const currentTemplateId = useQRStore((s) => s.currentTemplateId);
@@ -17,7 +19,28 @@ export function TemplateBar() {
   const applyTemplate = useQRStore((s) => s.applyTemplate);
   const [manageMode, setManageMode] = useState(false);
   const [customTemplates, setCustomTemplates] = useState<Template[]>(() => loadCustomTemplates());
+  const [previews, setPreviews] = useState<Record<string, string>>({});
   const nameRef = useRef('');
+
+  // 为内置模板生成缩略图
+  useEffect(() => {
+    const sampleContent = { type: 'text' as const, text: 'QRMagic' };
+    const sampleData = buildQrData(sampleContent);
+    encodeQRMatrix(sampleData, 'M').then((matrix) => {
+      if (!matrix.length) return;
+      const map: Record<string, string> = {};
+      builtinTemplates.forEach((tpl) => {
+        const previewParams: QRParams = {
+          ...getDefaultParams(),
+          ...deepMergeParams(getDefaultParams(), tpl.params),
+          export: { format: 'svg', size: 128, margin: 2, fileName: '' },
+        };
+        const svg = svgrRenderQRCode({ matrix, params: previewParams });
+        map[tpl.id] = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+      });
+      setPreviews(map);
+    });
+  }, []);
 
   // 合并内置 + 自定义模板
   const allTemplates = [...builtinTemplates, ...customTemplates];
@@ -187,21 +210,19 @@ export function TemplateBar() {
                     width: 56,
                     height: 56,
                     boxShadow: selected ? '0 0 0 2px #7B7CFF' : '0 0 0 1px #48484A',
-                    background: isCustom ? '#1E1E2E' : '#2C2C2E',
+                    background: isCustom ? '#1E1E2E' : '#FFFFFF',
                   }}
                 >
-                  <div
-                    className="flex items-center justify-center h-full"
-                    style={{
-                      fontSize: 10,
-                      color: nameColor,
-                      padding: 4,
-                      textAlign: 'center',
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {tpl.name}
-                  </div>
+                  {previews[tpl.id] ? (
+                    <img src={previews[tpl.id]} alt={tpl.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div
+                      className="flex items-center justify-center h-full"
+                      style={{ fontSize: 10, color: nameColor, padding: 4, textAlign: 'center', lineHeight: 1.3 }}
+                    >
+                      {tpl.name}
+                    </div>
+                  )}
                 </div>
 
                 {manageMode && isCustom ? (
@@ -243,4 +264,17 @@ export function TemplateBar() {
       </div>
     </div>
   );
+}
+
+/** 深度合并 QRParams（用于预览生成） */
+function deepMergeParams(target: QRParams, source: Partial<QRParams>): QRParams {
+  return {
+    content: { ...target.content, ...source.content },
+    dot: { ...target.dot, ...source.dot },
+    color: { ...target.color, ...source.color },
+    logo: { ...target.logo, ...source.logo },
+    border: { ...target.border, ...source.border },
+    export: { ...target.export, ...source.export },
+    errorCorrection: { ...target.errorCorrection, ...source.errorCorrection },
+  };
 }
