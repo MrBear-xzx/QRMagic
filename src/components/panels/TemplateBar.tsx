@@ -22,25 +22,29 @@ export function TemplateBar() {
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const nameRef = useRef('');
 
-  // 为内置模板生成缩略图
+  // 为内置 + 自定义模板生成缩略图
   useEffect(() => {
     const sampleContent = { type: 'text' as const, text: 'QRMagic' };
     const sampleData = buildQrData(sampleContent);
+    const currentCustom = customTemplates;
     encodeQRMatrix(sampleData, 'M').then((matrix) => {
       if (!matrix.length) return;
-      const map: Record<string, string> = {};
-      builtinTemplates.forEach((tpl) => {
-        const previewParams: QRParams = {
-          ...getDefaultParams(),
-          ...deepMergeParams(getDefaultParams(), tpl.params),
-          export: { format: 'svg', size: 128, margin: 2, fileName: '' },
-        };
-        const svg = svgrRenderQRCode({ matrix, params: previewParams });
-        map[tpl.id] = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+      setPreviews((prev) => {
+        const map = { ...prev };
+        [...builtinTemplates, ...currentCustom].forEach((tpl) => {
+          if (map[tpl.id]) return;
+          const previewParams: QRParams = {
+            ...getDefaultParams(),
+            ...deepMergeParams(getDefaultParams(), tpl.params),
+            export: { format: 'svg', size: 128, margin: 2, fileName: '' },
+          };
+          const svg = svgrRenderQRCode({ matrix, params: previewParams });
+          map[tpl.id] = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+        });
+        return map;
       });
-      setPreviews(map);
     });
-  }, []);
+  }, [customTemplates]);
 
   // 合并内置 + 自定义模板
   const allTemplates = [...builtinTemplates, ...customTemplates];
@@ -126,7 +130,16 @@ export function TemplateBar() {
       cancelText: '取消',
       onOk: () => {
         deleteCustomTemplate(tpl.id);
-        setCustomTemplates(loadCustomTemplates());
+        const remaining = loadCustomTemplates();
+        setCustomTemplates(remaining);
+        // 如果删除的是当前选中的模板，清除选中状态
+        if (useQRStore.getState().currentTemplateId === tpl.id) {
+          useQRStore.getState().setTemplateId(null);
+        }
+        // 如果没有自定义模板了，自动退出管理模式
+        if (remaining.length === 0) {
+          setManageMode(false);
+        }
         message.success('已删除');
       },
     });
