@@ -1,10 +1,7 @@
-import { useCallback, useState, type ReactNode } from 'react';
-import { Button, Space, Typography, Collapse } from 'antd';
-import {
-  ReloadOutlined,
-  QrcodeOutlined,
-} from '@ant-design/icons';
-import { useQRStore, getDefaultParams } from '@/store/useQRStore';
+import { useCallback, useState } from 'react';
+import { Button, Space, Typography, Tabs } from 'antd';
+import { ReloadOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { useQRStore } from '@/store/useQRStore';
 import { TemplateBar } from '../panels/TemplateBar';
 import { ContentPanel } from '../panels/ContentPanel';
 import { StylePanel } from '../panels/StylePanel';
@@ -18,186 +15,123 @@ import { QRPreview } from '../preview/QRPreview';
 
 const { Text } = Typography;
 
-const panelItems = [
-  {
-    key: 'content',
-    label: '内容设置',
-    icon: <QrcodeOutlined />,
-    children: <ContentPanel />,
-  },
-  {
-    key: 'style',
-    label: '码点样式',
-    icon: <span style={{ fontSize: 16 }}>⬛</span>,
-    children: <StylePanel />,
-  },
-  {
-    key: 'color',
-    label: '颜色渐变',
-    icon: <span style={{ fontSize: 16 }}>🎨</span>,
-    children: <ColorPanel />,
-  },
-  {
-    key: 'logo',
-    label: 'Logo 设置',
-    icon: <span style={{ fontSize: 16 }}>🖼️</span>,
-    children: <LogoPanel />,
-  },
-  {
-    key: 'border',
-    label: '边框装饰',
-    icon: <span style={{ fontSize: 16 }}>🔲</span>,
-    children: <BorderPanel />,
-  },
-  {
-    key: 'export',
-    label: '导出',
-    icon: <span style={{ fontSize: 16 }}>⬇️</span>,
-    children: <ExportPanel />,
-  },
-  {
-    key: 'batch',
-    label: '批量生成',
-    icon: <span style={{ fontSize: 16 }}>📦</span>,
-    children: <BatchPanel />,
-  },
-  {
-    key: 'history',
-    label: '历史记录',
-    icon: <span style={{ fontSize: 16 }}>🕐</span>,
-    children: <HistoryPanel />,
-  },
+const tabItems = [
+  { key: 'style', label: '码点样式', icon: '⬛', children: <StylePanel /> },
+  { key: 'color', label: '颜色渐变', icon: '🎨', children: <ColorPanel /> },
+  { key: 'logo', label: 'Logo', icon: '🖼️', children: <LogoPanel /> },
+  { key: 'border', label: '边框', icon: '🔲', children: <BorderPanel /> },
+  { key: 'export', label: '导出', icon: '⬇️', children: <ExportPanel /> },
+  { key: 'batch', label: '批量', icon: '📦', children: <BatchPanel /> },
+  { key: 'history', label: '历史', icon: '🕐', children: <HistoryPanel /> },
 ];
 
 export function AppLayout() {
   const resetParams = useQRStore((s) => s.resetParams);
-  const [activeKeys, setActiveKeys] = useState<string[]>(['content']);
+  const [activeTab, setActiveTab] = useState('style');
 
-  const handleCollapseChange = useCallback((keys: string | string[]) => {
-    setActiveKeys(Array.isArray(keys) ? keys : [keys]);
+  const handleTabChange = useCallback((key: string) => {
+    setActiveTab(key);
   }, []);
 
   return (
-    <div className="flex h-full w-full overflow-hidden mobile-stack">
-      {/* ========== 深色侧栏 ========== */}
-      <aside
-        className="flex flex-col h-full overflow-hidden shrink-0"
-        style={{ width: 380, backgroundColor: '#1C1C1E' }}
-      >
-        {/* 侧栏头部 */}
-        <header
-          className="flex items-center justify-between shrink-0 px-5 py-4"
-          style={{ borderBottom: '1px solid #48484A' }}
-        >
-          <Space align="center" size={10}>
-            <QrcodeOutlined style={{ fontSize: 22, color: '#7B7CFF' }} />
-            <div>
-              <Text
-                strong
-                style={{
-                  fontSize: 18,
-                  color: '#E5E5EA',
-                  letterSpacing: '-0.02em',
-                  display: 'block',
-                  lineHeight: 1.3,
-                }}
-              >
-                QRMagic
-              </Text>
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: '#8E8E93',
-                  display: 'block',
-                }}
-              >
-                二维码美化生成器
-              </Text>
-            </div>
-          </Space>
-
-          <Button
-            type="text"
-            size="small"
-            icon={<ReloadOutlined />}
-            onClick={resetParams}
-            style={{ color: '#8E8E93' }}
-            title="重置所有参数"
-          >
-            重置
-          </Button>
-        </header>
-
-        {/* 模板快速选择 */}
-        <div className="shrink-0 px-5 pt-4 pb-2">
-          <TemplateBar />
-        </div>
-
-        {/* 手风琴式参数面板 */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-          <CollapseSection
-            items={panelItems}
-            activeKeys={activeKeys}
-            onChange={handleCollapseChange}
-          />
-        </div>
-      </aside>
-
-      {/* ========== 明亮预览区 ========== */}
-      <main className="flex-1 h-full dot-canvas-bg flex items-center justify-center overflow-hidden">
-        <QRPreview />
-      </main>
-    </div>
-  );
-}
-
-/** 自定义手风琴面板 */
-function CollapseSection({
-  items,
-  activeKeys,
-  onChange,
-}: {
-  items: Array<{ key: string; label: string; icon: ReactNode; children: ReactNode }>;
-  activeKeys: string[];
-  onChange: (keys: string | string[]) => void;
-}) {
-  const collapseItems = items.map((item) => ({
-    key: item.key,
-    label: (
-      <Space size={8}>
-        {item.icon}
-        <Text style={{ color: '#E5E5EA', fontSize: 14, fontWeight: 500 }}>
-          {item.label}
-        </Text>
-      </Space>
-    ),
-    children: (
-      <div
+    <div className="flex flex-col h-full w-full overflow-hidden" style={{ background: '#1C1C1E' }}>
+      {/* ========== 顶栏 ========== */}
+      <header
+        className="flex items-center shrink-0 px-5 py-3"
         style={{
-          background: '#2C2C2E',
-          borderRadius: 8,
-          padding: '12px 16px',
+          background: '#1C1C1E',
+          borderBottom: '1px solid #48484A',
+          gap: 16,
         }}
       >
-        {item.children}
-      </div>
-    ),
-    style: {
-      border: 'none',
-      borderBottom: '1px solid #48484A',
-      borderRadius: 0,
-      background: 'transparent',
-    },
-  }));
+        {/* Logo */}
+        <Space align="center" size={8} style={{ flexShrink: 0 }}>
+          <QrcodeOutlined style={{ fontSize: 20, color: '#7B7CFF' }} />
+          <div>
+            <Text strong style={{ fontSize: 16, color: '#E5E5EA', display: 'block', lineHeight: 1.2 }}>
+              QRMagic
+            </Text>
+            <Text style={{ fontSize: 10, color: '#8E8E93', display: 'block' }}>
+              二维码美化生成器
+            </Text>
+          </div>
+        </Space>
 
-  return (
-    <Collapse
-      activeKey={activeKeys}
-      onChange={onChange}
-      bordered={false}
-      expandIconPosition="end"
-      items={collapseItems}
-      style={{ background: 'transparent' }}
-    />
+        {/* 模板栏 */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <TemplateBar />
+        </div>
+      </header>
+
+      {/* ========== 内容区：左侧页签 + 右侧预览 ========== */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* 左侧配置区 */}
+        <div
+          className="flex flex-col overflow-hidden"
+          style={{ flex: '1 1 55%', minWidth: 380 }}
+        >
+          {/* 内容设置（始终可见） */}
+          <div
+            className="shrink-0 px-4 py-3"
+            style={{ background: '#2C2C2E', borderBottom: '1px solid #48484A' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 13, color: '#E5E5EA', fontWeight: 500 }}>📝 内容设置</span>
+              <Button
+                type="text"
+                size="small"
+                icon={<ReloadOutlined />}
+                onClick={resetParams}
+                style={{ color: '#8E8E93', fontSize: 12 }}
+              >
+                重置
+              </Button>
+            </div>
+            <ContentPanel />
+          </div>
+
+          {/* 页签配置区 */}
+          <div className="flex-1 overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
+            <Tabs
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            tabBarStyle={{
+              margin: 0,
+              padding: '4px 16px',
+              background: '#1C1C1E',
+              borderBottom: '1px solid #48484A',
+            }}
+            tabBarGutter={8}
+            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+            items={tabItems.map((item) => ({
+              key: item.key,
+              label: (
+                <span style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ fontSize: 15 }}>{item.icon}</span>
+                  {item.label}
+                </span>
+              ),
+              children: (
+                <div
+                  className="flex-1 overflow-y-auto px-4 py-3"
+                  style={{ height: '100%', background: '#2C2C2E' }}
+                >
+                  {item.children}
+                </div>
+              ),
+            }))}
+          />
+        </div>
+        </div>
+
+        {/* 右侧预览区 */}
+        <div
+          className="shrink-0 flex items-center justify-center overflow-hidden dot-canvas-bg"
+          style={{ flex: '0 0 45%', minWidth: 320 }}
+        >
+          <QRPreview />
+        </div>
+      </div>
+    </div>
   );
 }

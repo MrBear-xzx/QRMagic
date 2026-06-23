@@ -148,52 +148,50 @@ export function TemplateBar() {
   return (
     <div>
       {/* 标题行 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 12, color: '#8E8E93', fontWeight: 500 }}>
-          快速模板
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <span style={{ fontSize: 12, color: '#8E8E93', fontWeight: 500, whiteSpace: 'nowrap' }}>
+          模板
         </span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          <Tooltip title="保存当前参数为模板">
-            <button
-              onClick={handleSave}
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 4,
-                border: 'none',
-                background: '#3A3A3C',
-                color: '#8E8E93',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-              }}
-            >
-              <PlusOutlined />
-            </button>
-          </Tooltip>
-          <Tooltip title={manageMode ? '退出管理' : '管理自定义模板'}>
-            <button
-              onClick={() => setManageMode(!manageMode)}
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 4,
-                border: 'none',
-                background: manageMode ? '#5E5CE6' : '#3A3A3C',
-                color: manageMode ? '#FFFFFF' : '#8E8E93',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-              }}
-            >
-              <SettingOutlined />
-            </button>
-          </Tooltip>
-        </div>
+        <Tooltip title="保存当前参数为模板">
+          <button
+            onClick={handleSave}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 5,
+              border: 'none',
+              background: '#3A3A3C',
+              color: '#8E8E93',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 14,
+            }}
+          >
+            <PlusOutlined />
+          </button>
+        </Tooltip>
+        <Tooltip title={manageMode ? '退出管理' : '管理自定义模板'}>
+          <button
+            onClick={() => setManageMode(!manageMode)}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 5,
+              border: 'none',
+              background: manageMode ? '#5E5CE6' : '#3A3A3C',
+              color: manageMode ? '#FFFFFF' : '#8E8E93',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 14,
+            }}
+          >
+            <SettingOutlined />
+          </button>
+        </Tooltip>
       </div>
 
       {/* 模板列表 */}

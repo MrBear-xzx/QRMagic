@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
-import { Form, Switch, Slider, Select, Upload, message } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { Form, Slider, Select, Upload, Button, message } from 'antd';
+import { InboxOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadChangeParam } from 'antd/es/upload';
 import { useQRStore } from '@/store/useQRStore';
 import type { LogoMaskShape } from '@/types';
 
 const { Dragger } = Upload;
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
 const MASK_SHAPES: { value: LogoMaskShape; label: string }[] = [
@@ -20,10 +20,9 @@ export function LogoPanel() {
   const updateLogo = useQRStore((s) => s.updateLogo);
   const [uploading, setUploading] = useState(false);
 
-  /** 读取文件为 Data URL 并更新 Logo */
+  /** 读取文件为 Data URL */
   const processFile = useCallback(
     (file: File | Blob) => {
-      // 校验类型
       if (file.type && !ALLOWED_TYPES.includes(file.type)) {
         message.warning('仅支持 PNG、JPEG、WebP 格式');
         return;
@@ -32,7 +31,6 @@ export function LogoPanel() {
         message.warning('图片大小不能超过 5MB');
         return;
       }
-
       setUploading(true);
       const reader = new FileReader();
       reader.onload = () => {
@@ -46,97 +44,85 @@ export function LogoPanel() {
       };
       reader.readAsDataURL(file);
     },
-    [updateLogo]
+    [updateLogo],
   );
 
-  /** customRequest：阻止自动 POST，改为本地文件读取 */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const customRequest = useCallback(
     (options: any) => {
       processFile(options.file as File);
       options.onSuccess?.('ok');
     },
-    [processFile]
+    [processFile],
   );
 
-  /** onChange：处理拖拽选择 */
   const handleChange = useCallback(
     (info: UploadChangeParam) => {
       const file = info.file.originFileObj;
-      if (file && info.file.status === 'done') {
-        if (!logo.imageDataUrl && file.size > 0) {
-          processFile(file);
-        }
+      if (file && info.file.status === 'done' && !logo.imageDataUrl) {
+        processFile(file);
       }
     },
-    [processFile, logo.imageDataUrl]
+    [processFile, logo.imageDataUrl],
   );
 
-  const handleToggleLogo = useCallback(
-    (checked: boolean) => {
-      updateLogo({ enabled: checked });
-    },
-    [updateLogo]
-  );
+  const handleRemove = useCallback(() => {
+    updateLogo({ imageDataUrl: null, enabled: false });
+  }, [updateLogo]);
 
   return (
     <div>
-      <Form.Item label="启用 Logo">
-        <Switch checked={logo.enabled} onChange={handleToggleLogo} />
-      </Form.Item>
-
-      {logo.enabled && (
-        <>
-          {!logo.imageDataUrl ? (
-            <Form.Item>
-              {uploading ? (
-                <div className="flex items-center justify-center py-4" style={{ color: '#8E8E93', fontSize: 13 }}>
-                  正在处理图片...
-                </div>
-              ) : (
-                <Dragger
-                  showUploadList={false}
-                  customRequest={customRequest}
-                  onChange={handleChange}
-                  accept={ALLOWED_TYPES.join(',')}
-                  style={{ padding: '16px 0' }}
-                >
-                  <p className="ant-upload-drag-icon" style={{ marginBottom: 8 }}>
-                    <InboxOutlined style={{ fontSize: 24, color: '#8E8E93' }} />
-                  </p>
-                  <p style={{ color: '#8E8E93', fontSize: 12 }}>
-                    点击或拖拽上传 Logo 图片（PNG/JPEG/WebP，≤5MB）
-                  </p>
-                </Dragger>
-              )}
-            </Form.Item>
+      {!logo.imageDataUrl ? (
+        <Form.Item>
+          {uploading ? (
+            <div className="flex items-center justify-center py-4" style={{ color: '#8E8E93', fontSize: 13 }}>
+              正在处理图片...
+            </div>
           ) : (
-            <Form.Item label="已上传 Logo">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img
-                  src={logo.imageDataUrl}
-                  alt="Logo 预览"
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 8,
-                    objectFit: 'cover',
-                    border: '1px solid #48484A',
-                  }}
-                />
-                <Upload
-                  showUploadList={false}
-                  customRequest={customRequest}
-                  onChange={handleChange}
-                  accept={ALLOWED_TYPES.join(',')}
-                >
-                  <span style={{ color: '#7B7CFF', cursor: 'pointer', fontSize: 13 }}>
-                    更换图片
-                  </span>
-                </Upload>
-              </div>
-            </Form.Item>
+            <Dragger
+              showUploadList={false}
+              customRequest={customRequest}
+              onChange={handleChange}
+              accept={ALLOWED_TYPES.join(',')}
+              style={{ padding: '16px 0' }}
+            >
+              <p className="ant-upload-drag-icon" style={{ marginBottom: 8 }}>
+                <InboxOutlined style={{ fontSize: 24, color: '#8E8E93' }} />
+              </p>
+              <p style={{ color: '#8E8E93', fontSize: 12 }}>
+                点击或拖拽上传 Logo 图片（PNG/JPEG/WebP，≤5MB）
+              </p>
+            </Dragger>
           )}
+        </Form.Item>
+      ) : (
+        <>
+          <Form.Item label="Logo">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <img
+                src={logo.imageDataUrl}
+                alt="Logo 预览"
+                style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', border: '1px solid #48484A' }}
+              />
+              <Upload
+                showUploadList={false}
+                customRequest={customRequest}
+                onChange={handleChange}
+                accept={ALLOWED_TYPES.join(',')}
+              >
+                <span style={{ color: '#7B7CFF', cursor: 'pointer', fontSize: 13 }}>更换图片</span>
+              </Upload>
+              <Button
+                type="text"
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={handleRemove}
+                style={{ color: '#FF453A', fontSize: 12 }}
+              >
+                移除
+              </Button>
+            </div>
+          </Form.Item>
 
           <Form.Item label="Logo 大小">
             <Slider

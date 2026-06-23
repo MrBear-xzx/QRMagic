@@ -219,14 +219,11 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   // ============================================================
 
   test('切换码点样式', async ({ page }) => {
-    // 展开码点样式面板
-    const stylePanel = page.locator('.ant-collapse-header').filter({ hasText: '码点样式' });
-    await stylePanel.click();
+    // 切换到码点样式 Tab
+    await page.locator('.ant-tabs-tab').filter({ hasText: '码点样式' }).click();
     await page.waitForTimeout(300);
-    // 找到码点形状选择器
-    const selects = page.locator('.ant-select');
-    const dotStyleSelect = selects.nth(1);
-    await dotStyleSelect.click();
+    // 找到码点形状选择器（在可见的 TabPane 内）
+    await page.locator('.ant-tabs-tabpane-active .ant-select').first().click();
 
     // 选择圆形
     await page.locator('.ant-select-item-option').filter({ hasText: '圆形' }).click();
@@ -238,9 +235,8 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   });
 
   test('调整码点大小滑块', async ({ page }) => {
-    // 展开码点样式面板
-    const stylePanel = page.locator('.ant-collapse-header').filter({ hasText: '码点样式' });
-    await stylePanel.click();
+    // 切换到码点样式 Tab
+    await page.locator('.ant-tabs-tab').filter({ hasText: '码点样式' }).click();
     await page.waitForTimeout(300);
     // 找到码点大小滑块
     const sliders = page.locator('.ant-slider');
@@ -269,9 +265,8 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   // ============================================================
 
   test('修改前景色更新 Canvas', async ({ page }) => {
-    // 展开颜色渐变面板
-    const colorPanel = page.locator('.ant-collapse-header').filter({ hasText: '颜色渐变' });
-    await colorPanel.click();
+    // 切换到颜色渐变 Tab
+    await page.locator('.ant-tabs-tab').filter({ hasText: '颜色' }).click();
     await page.waitForTimeout(300);
 
     // 找到前景色 input[type=color]
@@ -325,9 +320,8 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   // ============================================================
 
   test('点击下载触发下载', async ({ page }) => {
-    // 展开导出面板
-    const exportPanel = page.locator('.ant-collapse-header').filter({ hasText: '导出' });
-    await exportPanel.click();
+    // 切换到导出 Tab
+    await page.locator('.ant-tabs-tab').filter({ hasText: '导出' }).click();
     await page.waitForTimeout(300);
 
     // 监控下载事件
@@ -369,12 +363,11 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   // Logo 上传测试
   // ============================================================
 
-  test('Logo 面板默认折叠，展开后可见', async ({ page }) => {
-    const logoPanel = page.locator('.ant-collapse-header').filter({ hasText: 'Logo 设置' });
-    await expect(logoPanel).toBeVisible();
-
-    // Logo 面板默认折叠
-    const switchEl = page.locator('.ant-switch').first();
-    // 可能不直接可见，需要先展开
+  test('Logo 面板显示上传区域', async ({ page }) => {
+    const logoPanel = page.locator('.ant-tabs-tab').filter({ hasText: 'Logo' });
+    await logoPanel.click();
+    await page.waitForTimeout(300);
+    // 无 Logo 时显示上传拖拽区
+    await expect(page.locator('.ant-upload-drag-icon')).toBeVisible();
   });
 });

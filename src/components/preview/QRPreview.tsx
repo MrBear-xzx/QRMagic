@@ -35,17 +35,11 @@ export function QRPreview() {
     setOffset({ x: 0, y: 0 });
   }, []);
 
-  // 鼠标滚轮缩放（使用原生监听器以设置 passive: false）
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setDisplayScale((s) => Math.max(0.3, Math.min(4, s + delta)));
-    };
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
+  // 鼠标滚轮缩放
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setDisplayScale((s) => Math.max(0.3, Math.min(4, s + delta)));
   }, []);
 
   // 拖拽
@@ -152,6 +146,7 @@ export function QRPreview() {
     <div
       ref={containerRef}
       className="relative flex-1 h-full flex items-center justify-center overflow-hidden"
+      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
