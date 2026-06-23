@@ -219,9 +219,12 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   // ============================================================
 
   test('切换码点样式', async ({ page }) => {
-    // 内容设置和码点样式默认展开，找到码点形状选择器
+    // 展开码点样式面板
+    const stylePanel = page.locator('.ant-collapse-header').filter({ hasText: '码点样式' });
+    await stylePanel.click();
+    await page.waitForTimeout(300);
+    // 找到码点形状选择器
     const selects = page.locator('.ant-select');
-    // 第二个 Select 是码点形状（在码点样式面板内）
     const dotStyleSelect = selects.nth(1);
     await dotStyleSelect.click();
 
@@ -235,6 +238,10 @@ test.describe('QRMagic - 二维码美化生成器', () => {
   });
 
   test('调整码点大小滑块', async ({ page }) => {
+    // 展开码点样式面板
+    const stylePanel = page.locator('.ant-collapse-header').filter({ hasText: '码点样式' });
+    await stylePanel.click();
+    await page.waitForTimeout(300);
     // 找到码点大小滑块
     const sliders = page.locator('.ant-slider');
     // 操作码点面板的滑块
