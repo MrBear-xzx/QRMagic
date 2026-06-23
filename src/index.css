@@ -61,6 +61,37 @@ body {
   background: #6E6E73;
 }
 
+/* 移动端适配 */
+@media (max-width: 767px) {
+  .mobile-hide {
+    display: none !important;
+  }
+  /* Logo 独占一行 */
+  .mobile-header {
+    flex-wrap: wrap !important;
+  }
+  .mobile-header > :first-child {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  /* 隐藏预览区 */
+  .mobile-stack > div:last-child {
+    display: none !important;
+  }
+  /* 页签横向滚动 */
+  .ant-tabs-nav-list {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+  .ant-tabs-tab {
+    flex-shrink: 0 !important;
+  }
+  /* 隐藏 antd 自带的溢出操作按钮 */
+  .ant-tabs-nav-operations {
+    display: none !important;
+  }
+}
+
 /* 减少动画偏好 */
 @media (prefers-reduced-motion: reduce) {
   *,

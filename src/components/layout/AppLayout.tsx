@@ -16,18 +16,18 @@ import { QRPreview } from '../preview/QRPreview';
 const { Text } = Typography;
 
 const tabItems = [
+  { key: 'export', label: '导出', icon: '⬇️', children: <ExportPanel /> },
   { key: 'style', label: '码点样式', icon: '⬛', children: <StylePanel /> },
   { key: 'color', label: '颜色渐变', icon: '🎨', children: <ColorPanel /> },
   { key: 'logo', label: 'Logo', icon: '🖼️', children: <LogoPanel /> },
   { key: 'border', label: '边框', icon: '🔲', children: <BorderPanel /> },
-  { key: 'export', label: '导出', icon: '⬇️', children: <ExportPanel /> },
   { key: 'batch', label: '批量', icon: '📦', children: <BatchPanel /> },
   { key: 'history', label: '历史', icon: '🕐', children: <HistoryPanel /> },
 ];
 
 export function AppLayout() {
   const resetParams = useQRStore((s) => s.resetParams);
-  const [activeTab, setActiveTab] = useState('style');
+  const [activeTab, setActiveTab] = useState('export');
 
   const handleTabChange = useCallback((key: string) => {
     setActiveTab(key);
@@ -37,7 +37,7 @@ export function AppLayout() {
     <div className="flex flex-col h-full w-full overflow-hidden" style={{ background: '#1C1C1E' }}>
       {/* ========== 顶栏 ========== */}
       <header
-        className="flex items-center shrink-0 px-5 py-3"
+        className="flex items-center shrink-0 px-5 py-3 mobile-header"
         style={{
           background: '#1C1C1E',
           borderBottom: '1px solid #48484A',
@@ -51,7 +51,7 @@ export function AppLayout() {
             <Text strong style={{ fontSize: 16, color: '#E5E5EA', display: 'block', lineHeight: 1.2 }}>
               QRMagic
             </Text>
-            <Text style={{ fontSize: 10, color: '#8E8E93', display: 'block' }}>
+            <Text className="mobile-hide" style={{ fontSize: 10, color: '#8E8E93', display: 'block' }}>
               二维码美化生成器
             </Text>
           </div>
@@ -64,7 +64,7 @@ export function AppLayout() {
       </header>
 
       {/* ========== 内容区：左侧页签 + 右侧预览 ========== */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden mobile-stack">
         {/* 左侧配置区 */}
         <div
           className="flex flex-col overflow-hidden"
