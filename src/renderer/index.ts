@@ -3,7 +3,7 @@ import { getFinderPositions, getAlignmentCenters, drawDots } from './drawDots';
 import { getForegroundColor } from './drawBackground';
 import { drawLogo } from './drawLogo';
 import { drawBorder } from './drawBorder';
-import { drawLabel } from './drawLabel';
+import { drawLabel, measureLabelLines } from './drawLabel';
 
 interface RenderOptions {
   canvas: HTMLCanvasElement;
@@ -34,9 +34,12 @@ export async function renderQRCode(options: RenderOptions): Promise<void> {
   const offsetX = margin + QUIET_MODULES * dotSize;
   const offsetY = margin + QUIET_MODULES * dotSize;
 
-  // 标签高度
+  // 标签高度（根据文本实际行数计算）
   const hasLabel = params.border.labelText.trim().length > 0;
-  const labelHeight = hasLabel ? params.border.labelFontSize * 3 : 0;
+  const labelLines = hasLabel
+    ? measureLabelLines(params.border.labelText, qrTotalSize, params.border.labelFontSize)
+    : 0;
+  const labelHeight = labelLines * params.border.labelFontSize * 1.5;
   const canvasHeight = exportSize + labelHeight;
 
   // 设置 Canvas 尺寸

@@ -3,7 +3,7 @@ import { drawSvgBackground } from './drawSvgBackground';
 import { drawSvgDots } from './drawSvgDots';
 import { drawSvgLogo } from './drawSvgLogo';
 import { drawSvgBorder } from './drawSvgBorder';
-import { drawSvgLabel } from './drawSvgLabel';
+import { drawSvgLabel, measureSvgLabelLines } from './drawSvgLabel';
 
 interface SvgrRenderOptions {
   matrix: QRMatrix;
@@ -30,9 +30,12 @@ export function svgrRenderQRCode(options: SvgrRenderOptions): string {
   const offsetX = margin + QUIET_MODULES * dotSize;
   const offsetY = margin + QUIET_MODULES * dotSize;
 
-  // 标签高度
+  // 标签高度（根据文本实际行数计算）
   const hasLabel = params.border.labelText.trim().length > 0;
-  const labelHeight = hasLabel ? params.border.labelFontSize * 3 : 0;
+  const labelLines = hasLabel
+    ? measureSvgLabelLines(params.border.labelText, qrTotalSize, params.border.labelFontSize)
+    : 0;
+  const labelHeight = labelLines * params.border.labelFontSize * 1.5;
   const canvasHeight = exportSize + labelHeight;
 
   // 图层产出
