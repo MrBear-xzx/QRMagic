@@ -116,6 +116,8 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 | 历史记录 | localStorage 最近 20 条，点击恢复参数 | ✅ |
 | 自定义模板 | 用户保存/重命名/删除，上限 10 个 | ✅ |
 | PWA | Service Worker + manifest + 离线缓存 | ✅ |
+| Logo 拖拽 | 预览区直接拖入图片即可上传 | ✅ |
+| 容错等级 | 导出面板暴露 L/M/Q/H 选择 | ✅ |
 | 模板 | 6 个内置模板（经典/商务/活力/清新/暗夜/极客） | ✅ |
 | Bug 修复 | 14 个 High/Medium 问题（渐变背景、vCard 转义等） | ✅ |
 | 编译 | TypeScript strict 模式 + Vite build 通过 | ✅ |
@@ -136,8 +138,6 @@ npx playwright test  # E2E 测试（需先 pnpm dev）
 
 | 功能 | 说明 |
 |------|------|
-| Logo 拖拽上传 | 预览区直接拖拽 |
-| 容错等级选择器 | UI 暴露 L/M/Q/H 选择 |
 | 模板缩略图 | 为内置模板生成预览图 |
 | Logo 上传 E2E 测试 | Playwright 模拟文件上传全流程 |
 | 移动端视口测试 | iPhone/Android 视口基础测试 |

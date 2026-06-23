@@ -1,5 +1,5 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { Button, Space, Tooltip, Typography } from 'antd';
+import { Button, Space, Tooltip, Typography, message } from 'antd';
 import {
   ZoomInOutlined,
   ZoomOutOutlined,
@@ -10,6 +10,9 @@ import { useCanvasRenderer } from './useCanvasRenderer';
 
 const { Text } = Typography;
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+
 export function QRPreview() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +21,9 @@ export function QRPreview() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const dragStart = useRef({ x: 0, y: 0, ox: 0, oy: 0 });
   const params = useQRStore((s) => s.params);
+  const updateLogo = useQRStore((s) => s.updateLogo);
+  const [isLogoDragOver, setIsLogoDragOver] = useState(false);
+  const logoDragCounter = useRef(0);
 
   const { reRender } = useCanvasRenderer(canvasRef);
 
@@ -54,10 +60,66 @@ export function QRPreview() {
 
   const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
+  // ===== Logo 拖拽上传 =====
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    logoDragCounter.current += 1;
+    if (logoDragCounter.current === 1) {
+      setIsLogoDragOver(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    logoDragCounter.current -= 1;
+    if (logoDragCounter.current === 0) {
+      setIsLogoDragOver(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsLogoDragOver(false);
+    logoDragCounter.current = 0;
+
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+
+    // 校验
+    if (file.type && !ALLOWED_TYPES.includes(file.type)) {
+      message.warning('仅支持 PNG、JPEG、WebP 格式的 Logo 图片');
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      message.warning('Logo 图片大小不能超过 5MB');
+      return;
+    }
+
+    // 读取为 base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      updateLogo({ imageDataUrl: reader.result as string, enabled: true });
+      message.success('Logo 已更新');
+    };
+    reader.onerror = () => {
+      message.error('图片读取失败，请重试');
+    };
+    reader.readAsDataURL(file);
+  }, [updateLogo]);
+
   // 键盘快捷键（仅在非输入框焦点时生效）
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      // 跳过输入框内的快捷键
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
 
@@ -89,8 +151,36 @@ export function QRPreview() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
+      {/* Logo 拖拽高亮遮罩 */}
+      {isLogoDragOver && (
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{
+            zIndex: 20,
+            background: 'rgba(94, 92, 230, 0.15)',
+            border: '2px dashed #7B7CFF',
+            borderRadius: 12,
+            margin: 16,
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <Text style={{ color: '#7B7CFF', fontSize: 18, fontWeight: 600 }}>
+              📥 拖放 Logo 到此处
+            </Text>
+            <br />
+            <Text style={{ color: '#8E8E93', fontSize: 12 }}>
+              PNG / JPEG / WebP · 最大 5MB
+            </Text>
+          </div>
+        </div>
+      )}
+
       {/* QR 卡片 */}
       <div
         className="qr-card-shadow"

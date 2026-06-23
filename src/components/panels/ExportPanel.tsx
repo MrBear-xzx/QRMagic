@@ -3,6 +3,7 @@ import { Form, Select, Slider, Input, Button, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useQRStore } from '@/store/useQRStore';
 import { downloadQRCode } from '@/utils/download';
+import type { ErrorLevel } from '@/types';
 
 const SIZE_PRESETS = [
   { value: 256, label: '256px' },
@@ -14,6 +15,8 @@ const SIZE_PRESETS = [
 export function ExportPanel() {
   const params = useQRStore((s) => s.params);
   const updateExport = useQRStore((s) => s.updateExport);
+  const setErrorLevel = useQRStore((s) => s.setErrorLevel);
+  const errorLevel = params.errorCorrection.level;
   const exportParams = params.export;
   const [downloading, setDownloading] = useState(false);
 
@@ -38,6 +41,19 @@ export function ExportPanel() {
           options={[
             { value: 'png', label: 'PNG 位图' },
             { value: 'svg', label: 'SVG 矢量' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="容错等级">
+        <Select
+          value={errorLevel}
+          onChange={(v) => setErrorLevel(v as ErrorLevel)}
+          options={[
+            { value: 'L', label: 'L 低 (~7%) — 更多数据容量' },
+            { value: 'M', label: 'M 中 (~15%) — 推荐平衡' },
+            { value: 'Q', label: 'Q 中高 (~25%)' },
+            { value: 'H', label: 'H 高 (~30%) — 更易扫描' },
           ]}
         />
       </Form.Item>
