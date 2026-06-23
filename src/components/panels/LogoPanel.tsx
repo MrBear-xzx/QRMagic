@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Form, Slider, Select, Upload, Button, message } from 'antd';
+import { Form, Slider, Select, Upload, Button } from 'antd';
 import { InboxOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadChangeParam } from 'antd/es/upload';
 import { useQRStore } from '@/store/useQRStore';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { LogoMaskShape } from '@/types';
 
 const { Dragger } = Upload;
@@ -19,6 +20,7 @@ export function LogoPanel() {
   const logo = useQRStore((s) => s.params.logo);
   const updateLogo = useQRStore((s) => s.updateLogo);
   const [uploading, setUploading] = useState(false);
+  const message = useAppMessage();
 
   /** 读取文件为 Data URL */
   const processFile = useCallback(

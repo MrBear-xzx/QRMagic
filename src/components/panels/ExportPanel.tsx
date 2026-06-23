@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Form, Select, Slider, Input, Button, message } from 'antd';
+import { Form, Select, Slider, Input, Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useQRStore } from '@/store/useQRStore';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import { downloadQRCode } from '@/utils/download';
 import type { ErrorLevel } from '@/types';
 
@@ -19,6 +20,7 @@ export function ExportPanel() {
   const errorLevel = params.errorCorrection.level;
   const exportParams = params.export;
   const [downloading, setDownloading] = useState(false);
+  const message = useAppMessage();
 
   const handleDownload = async () => {
     setDownloading(true);

@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Button, Progress, Table, message, Space, Typography, Upload } from 'antd';
+import { Button, Progress, Table, Space, Typography, Upload } from 'antd';
 import { UploadOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
 import { saveAs } from 'file-saver';
 import type { UploadFile, RcFile } from 'antd/es/upload/interface';
 import { useQRStore } from '@/store/useQRStore';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseCsv, CSV_TEMPLATE, type CsvRow } from '@/utils/csvParser';
 import { generateBatch } from '@/utils/batchGenerator';
 
@@ -20,6 +21,7 @@ export function BatchPanel() {
   const [fileName, setFileName] = useState('');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const abortRef = useRef<AbortController | null>(null);
+  const message = useAppMessage();
 
   /** 处理文件选择 */
   const handleFile = useCallback((file: RcFile) => {

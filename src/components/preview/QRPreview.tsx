@@ -1,5 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { Button, Space, Tooltip, Typography, message } from 'antd';
+import { Button, Space, Tooltip, Typography } from 'antd';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import {
   ZoomInOutlined,
   ZoomOutOutlined,
@@ -24,6 +25,7 @@ export function QRPreview() {
   const updateLogo = useQRStore((s) => s.updateLogo);
   const [isLogoDragOver, setIsLogoDragOver] = useState(false);
   const logoDragCounter = useRef(0);
+  const message = useAppMessage();
 
   const { reRender } = useCanvasRenderer(canvasRef);
 

@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Button, Popconfirm, message, Typography } from 'antd';
+import { Button, Popconfirm, Typography } from 'antd';
 import { DeleteOutlined, ClearOutlined } from '@ant-design/icons';
 import { useQRStore } from '@/store/useQRStore';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import {
   loadHistory,
   deleteHistory,
@@ -36,6 +37,7 @@ export function HistoryPanel() {
   const applyTemplate = useQRStore((s) => s.applyTemplate);
   const setTemplateId = useQRStore((s) => s.setTemplateId);
   const historyVersion = useQRStore((s) => s.historyVersion);
+  const message = useAppMessage();
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
 
   const refresh = useCallback(() => {

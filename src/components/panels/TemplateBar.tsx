@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Tooltip, message, Input, Modal } from 'antd';
+import { Tooltip, Input, Modal } from 'antd';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import { useQRStore, getDefaultParams } from '@/store/useQRStore';
 import { builtinTemplates } from '@/templates';
@@ -21,6 +22,7 @@ export function TemplateBar() {
   const [customTemplates, setCustomTemplates] = useState<Template[]>(() => loadCustomTemplates());
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const nameRef = useRef('');
+  const message = useAppMessage();
 
   // 为内置 + 自定义模板生成缩略图
   useEffect(() => {
@@ -89,7 +91,7 @@ export function TemplateBar() {
         }
       },
     });
-  }, [params]);
+  }, [params, message]);
 
   /** 重命名 */
   const handleRename = useCallback((tpl: Template) => {
@@ -118,7 +120,7 @@ export function TemplateBar() {
         message.success('已重命名');
       },
     });
-  }, []);
+  }, [message]);
 
   /** 删除 */
   const handleDelete = useCallback((tpl: Template) => {
@@ -143,7 +145,7 @@ export function TemplateBar() {
         message.success('已删除');
       },
     });
-  }, []);
+  }, [message]);
 
   return (
     <div>
